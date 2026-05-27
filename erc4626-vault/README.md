@@ -1,66 +1,83 @@
-## Foundry
+# ZK-Enabled ERC4626 Yield Vault
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A decentralized, zero-knowledge verifiable yield aggregator built on the ERC4626 standard. This protocol accepts USDC deposits, generates yield via the Aave V3 protocol, and utilizes zk-SNARKs (Groth16) to provide cryptographically secure, off-chain proofs of reserves.
 
-Foundry consists of:
+## Architecture 
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+The protocol is divided into four core smart contracts to ensure separation of concerns and upgradability:
 
-## Documentation
+1. **YieldVault (ERC4626):** The core user-facing contract managing USDC deposits, share minting, and withdrawal accounting.
+2. **AaveV3Strategy:** The yield-generating module that interfaces directly with Aave V3 lending pools to deploy idle vault capital.
+3. **ProofOfReserves (Oracle):** An oracle contract that accepts and stores the verified solvency state of the vault.
+4. **Groth16Verifier:** An on-chain ZK-SNARK verifier that mathematically guarantees off-chain reserve calculations without exposing sensitive operational data.
 
-https://book.getfoundry.sh/
+### System Flow
+* **Deposit:** User deposits USDC into `YieldVault` → Receives vault shares representing fractional ownership.
+* **Deploy:** Vault allocates capital to `AaveV3Strategy` → Earns dynamic APY.
+* **Verify:** Off-chain keeper generates a ZK proof of total assets → Submits to `ProofOfReserves` → `Groth16Verifier` validates proof → Vault dashboard reflects `VERIFIED` state.
 
-## Usage
+## Live Deployments (Sepolia Testnet)
 
-### Build
+All contracts are fully verified on Sepolia Etherscan.
 
-```shell
-$ forge build
-```
+* **USDC (Testnet):** `0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8`
+* **YieldVault:** `0x265B2E9CA36715E31e1e012A4B076f8f1c3a9D7e`
+* **AaveV3Strategy:** `0xa689d363054FF410aD92EeDcAFaB7D743Ad72653`
+* **ProofOfReserves:** `0x2560E7C7d787afB262fD81A495a25F4BA3Ea4aDC`
+* **Groth16Verifier:** `0xB7011e1362b2B6b13F61E647077A4A61f7D1368C`
 
-### Test
+## Tech Stack
+* **Smart Contracts:** Solidity, Foundry (Forge/Cast)
+* **Frontend:** Next.js (React), Tailwind CSS
+* **Web3 Integration:** Wagmi, RainbowKit, Viem
+* **Zero-Knowledge:** Circom, SnarkJS (Groth16)
 
-```shell
-$ forge test
-```
+---
 
-### Format
+## Local Environment Setup
 
-```shell
-$ forge fmt
-```
+### Prerequisites
+* [Foundry](https://getfoundry.sh/) (Forge, Cast, Anvil)
+* [Node.js](https://nodejs.org/) & [pnpm](https://pnpm.io/)
 
-### Gas Snapshots
+### 1. Smart Contracts (`erc4626-vault`)
+```bash
+# Clone the repository
+git clone [https://github.com/jbhavya876/erc4626_vault.git](https://github.com/jbhavya876/erc4626_vault.git)
+cd erc4626_vault/erc4626-vault
 
-```shell
-$ forge snapshot
-```
+# Install submodules and dependencies
+forge install
 
-### Anvil
+# Compile contracts
+forge build
 
-```shell
-$ anvil
-```
+# Run unit tests
+forge test -vvv
+2. Frontend Application (vault-frontend)
+Bash
+cd ../vault-frontend
 
-### Deploy
+# Install dependencies
+pnpm install
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+# Start development server
+pnpm run dev
+3. Environment Variables
+Create a .env file in both directories based on the .env.example templates.
 
-### Cast
+Vault .env:
 
-```shell
-$ cast <subcommand>
-```
+Code snippet
+SEPOLIA_RPC_URL="your_alchemy_or_infura_rpc"
+PRIVATE_KEY="your_wallet_private_key"
+ETHERSCAN_API_KEY="your_etherscan_key"
+Frontend .env.local:
 
-### Help
+Code snippet
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your_walletconnect_project_id"
+Security & Disclaimer
+This protocol is deployed on a test network for educational and demonstration purposes. It has not undergone formal security auditing. Do not deploy or use this code with real funds on Mainnet.
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Author
+Bhavya Jain
