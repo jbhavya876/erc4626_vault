@@ -54,8 +54,10 @@ forge build
 
 # Run unit tests
 forge test -vvv
-2. Frontend Application (vault-frontend)
-Bash
+```
+
+### 2. Frontend Application (vault-frontend)
+```bash
 cd ../vault-frontend
 
 # Install dependencies
@@ -63,7 +65,10 @@ pnpm install
 
 # Start development server
 pnpm run dev
-3. Environment Variables
+```
+
+### 3. Environment Variables
+```bash
 Create a .env file in both directories based on the .env.example templates.
 
 Vault .env:
@@ -76,7 +81,10 @@ Frontend .env.local:
 
 Code snippet
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your_walletconnect_project_id"
-Security & Disclaimer
+```
+---
+
+## Security & Disclaimer
 This protocol is deployed on a test network for educational and demonstration purposes. It has not undergone formal security auditing. Do not deploy or use this code with real funds on Mainnet.
 
 Author
